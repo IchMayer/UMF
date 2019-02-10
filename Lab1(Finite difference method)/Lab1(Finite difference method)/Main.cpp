@@ -4,6 +4,5 @@
 int main()
 {
 	Model a;
-	a.Init(5, 2);
 	return 0;
 }
