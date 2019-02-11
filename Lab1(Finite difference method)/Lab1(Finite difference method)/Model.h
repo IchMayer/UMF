@@ -17,7 +17,7 @@ public:
 		//    *  *		<- minY
 		// A  A  A  A
 		// |  |  |  |
-		// m  m  m  m
+		// m  i  a  m
 		// i  X  X  a
 		// n  T  T  x
 		// X        X
@@ -29,7 +29,7 @@ public:
 		};
 		double minX, maxX;
 		double minY, maxY;
-		double mXT, mXT;
+		double iXT, aXT;
 		double YT;
 	};
 
@@ -71,13 +71,27 @@ public:
 	vector<vector<double>> GetResult();
 
 private:
+	struct ShapeIndex
+	{
+		size_t maxX;
+		size_t maxY;
+		size_t iXT, aXT;
+		size_t YT;
+	};
+
 	size_t n, m;									//Matrix n * m
 	function<double(double, double)> F;				//F function
 	vector<double> f;								//f - local F
 	vector<double> u;								//u - local U
 	vector<vector<double>> L;						//L 5 diagonal matrix Lu = f
-	double hI, hJ;									//Step grid
+	double hHI, hHJ;								//Step grid
+	double hLT, hJT;								//MoreStep grid not use
 	Shape shape;									//Shape of area
+	ShapeIndex index;								//Shape in index
 	vector<Border> borders;							//Border of area
+
+	void ConvertShape2Index();						
+
+	void CreateMatrixL();
 };
 
