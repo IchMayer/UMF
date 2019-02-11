@@ -27,6 +27,7 @@ public:
 			Rectangle,
 			T
 		};
+		Format type;
 		double minX, maxX;
 		double minY, maxY;
 		double iXT, aXT;
@@ -66,6 +67,10 @@ public:
 	/// <param name="F">F from Lu = F. </param>
 	void SetF(function<double(double, double)> F);
 
+	/// <param name="lamda">New lamda </param>
+	void SetLamda(double lamda);
+
+
 	void FDM();
 	
 	vector<vector<double>> GetResult();
@@ -79,6 +84,7 @@ private:
 		size_t YT;
 	};
 
+	double lamda;									//lamda
 	size_t n, m;									//Matrix n * m
 	function<double(double, double)> F;				//F function
 	vector<double> f;								//f - local F
