@@ -98,6 +98,8 @@ private:
 
 	void ConvertShape2Index();						
 
+	void ConvertL2MatrixFormat();					//Matrix - программа из прошлого года, которая решает диагональные матрицы методлом якоби и зегеля
+
 	void CreateMatrixL();
 };
 
