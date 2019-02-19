@@ -11,15 +11,15 @@ int main()
 	shape.minY = 0;
 	shape.aXT = 0.75;
 	shape.iXT = 0.25;
-	shape.YT = 0.75;
-	shape.type = shape.Rectangle;
+	shape.YT = 0.5;
+	shape.type = shape.T;
 
 	a.SetShape(shape);
 	a.CreateGrid(4, 4);
 	
 	function < double(double, double) > f = [](double y, double x) { return 0; };
-	function < double(double, double) > u = [](double y, double x) { return y; };
-	function < double(double, double) > q = [](double y, double x) { return 1; };
+	function < double(double, double) > u = [](double y, double x) { return 2*x + 2 * y; };
+	function < double(double, double) > q = [](double y, double x) { return -2; };
 	
 	Model::Border b1;
 
@@ -32,13 +32,13 @@ int main()
 	b2.type = b2.Second;
 	b2.borderF = q;
 
-	b3.type = b3.Second;
+	b3.type = b3.Third;
 	b3.borderF = f;
 
-	a.AddBorder(b1);
-	a.AddBorder(b1);
 	a.AddBorder(b2);
 	a.AddBorder(b1);
+	a.AddBorder(b2);
+	a.AddBorder(b2);
 	a.AddBorder(b2);
 	a.AddBorder(b2);
 	a.AddBorder(b2);

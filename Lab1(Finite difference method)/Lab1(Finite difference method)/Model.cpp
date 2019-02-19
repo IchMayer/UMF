@@ -185,8 +185,8 @@ void Model::CreateMatrixL()
 						case 0:
 							if (p)
 							{
-								L[i * m + j][2] = -lamda / hHI;
-								L[i * m + j][3] = lamda / hHI;
+								L[i * m + j][2] = lamda / hHI;
+								L[i * m + j][1] = -lamda / hHI;
 							}
 							else
 							{
@@ -196,8 +196,8 @@ void Model::CreateMatrixL()
 						case 1:
 							if (p)
 							{
-								L[i * m + j][2] = -lamda / hHI;
-								L[i * m + j][4] = lamda / hHI;
+								L[i * m + j][2] = lamda / hHI;
+								L[i * m + j][0] = -lamda / hHI;
 							}
 							else
 							{
@@ -208,7 +208,7 @@ void Model::CreateMatrixL()
 							if (p)
 							{
 								L[i * m + j][2] = -lamda / hHI;
-								L[i * m + j][1] = lamda / hHI;
+								L[i * m + j][3] = lamda / hHI;
 							}
 							else
 							{
@@ -219,7 +219,7 @@ void Model::CreateMatrixL()
 							if (p)
 							{
 								L[i * m + j][2] = -lamda / hHI;
-								L[i * m + j][0] = lamda / hHI;
+								L[i * m + j][4] = lamda / hHI;
 							}
 							else
 							{
@@ -288,8 +288,8 @@ void Model::CreateMatrixL()
 						case 0:
 							if (p)
 							{
-								L[i * m + j][2] = -lamda / hHI;
-								L[i * m + j][3] = lamda / hHI;
+								L[i * m + j][2] = lamda / hHI;
+								L[i * m + j][1] = -lamda / hHI;
 							}
 							else
 							{
@@ -299,8 +299,8 @@ void Model::CreateMatrixL()
 						case 1:
 							if (p)
 							{
-								L[i * m + j][2] = -lamda / hHI;
-								L[i * m + j][4] = lamda / hHI;
+								L[i * m + j][2] = lamda / hHI;
+								L[i * m + j][0] = -lamda / hHI;
 							}
 							else
 							{
@@ -311,7 +311,7 @@ void Model::CreateMatrixL()
 							if (p)
 							{
 								L[i * m + j][2] = -lamda / hHI;
-								L[i * m + j][1] = lamda / hHI;
+								L[i * m + j][3] = lamda / hHI;
 							}
 							else
 							{
@@ -322,7 +322,7 @@ void Model::CreateMatrixL()
 							if (p)
 							{
 								L[i * m + j][2] = -lamda / hHI;
-								L[i * m + j][0] = lamda / hHI;
+								L[i * m + j][4] = lamda / hHI;
 							}
 							else
 							{
@@ -332,8 +332,8 @@ void Model::CreateMatrixL()
 						case 4:
 							if (p)
 							{
-								L[i * m + j][2] = -lamda / hHI;
-								L[i * m + j][4] = lamda / hHI;
+								L[i * m + j][2] = lamda / hHI;
+								L[i * m + j][0] = -lamda / hHI;
 							}
 							else
 							{
@@ -343,8 +343,8 @@ void Model::CreateMatrixL()
 						case 5:
 							if (p)
 							{
-								L[i * m + j][2] = -lamda / hHI;
-								L[i * m + j][3] = lamda / hHI;
+								L[i * m + j][2] = lamda / hHI;
+								L[i * m + j][1] = -lamda / hHI;
 							}
 							else
 							{
@@ -355,7 +355,7 @@ void Model::CreateMatrixL()
 							if (p)
 							{
 								L[i * m + j][2] = -lamda / hHI;
-								L[i * m + j][1] = lamda / hHI;
+								L[i * m + j][3] = lamda / hHI;
 							}
 							else
 							{
@@ -365,8 +365,8 @@ void Model::CreateMatrixL()
 						case 7:
 							if (p)
 							{
-								L[i * m + j][2] = -lamda / hHI;
-								L[i * m + j][4] = lamda / hHI;
+								L[i * m + j][2] = lamda / hHI;
+								L[i * m + j][0] = -lamda / hHI;
 							}
 							else
 							{
