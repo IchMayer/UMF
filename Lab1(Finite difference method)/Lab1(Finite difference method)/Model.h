@@ -44,6 +44,7 @@ public:
 			Third
 		};
 
+		double b;
 		Type type;			
 		function<double(double, double)> borderF;
 	};
@@ -99,6 +100,8 @@ private:
 	void ConvertShape2Index();						
 
 	void ConvertL2MatrixFormat();					//Matrix - программа из прошлого года, которая решает диагональные матрицы методлом якоби и зегеля
+
+	vector<vector<double>> ConvertL2FullMatrix();
 
 	void CreateMatrixL();
 };

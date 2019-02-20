@@ -2,6 +2,7 @@
 #include "Includes.h"
 #include "Matrix.cpp"
 
+typedef void(*Gause)(std::vector<std::vector<double>> &A, std::vector<double> &F, std::vector<double> &X);
 
 Model::Model()
 {
@@ -46,24 +47,41 @@ void Model::FDM()
 	ConvertShape2Index();
 	CreateMatrixL();
 
-	Matrix<double> a;
+	//Matrix<double> a;
 
-	ConvertL2MatrixFormat();
+	auto hinstLib = LoadLibrary(TEXT("LDU.dll"));
+	Gause gause = (Gause)GetProcAddress(hinstLib, "Gause");
 
-	a.SetMatrix(L.size(), n, L, f);
+	vector<vector<double>> A = ConvertL2FullMatrix();
+	u.resize(n * m);
+	gause(A, f, u);
 
-	//a.GaussSeidelMethod();
-	//a.JacobiMethod();
+	//ConvertL2MatrixFormat();
+	//cout << "\n\n\n\n\n" << endl;
+	//for (size_t i = 0; i < L.size(); i++)
+	//{
+	//	for (size_t j = 0; j < 5; j++)
+	//	{
+	//		cout << L[i][j] << " ";
+	//	}
+	//	cout << "         " << f[i] << endl;
+	//}
 
-	do
-	{
-		a.GaussSeidelMethod();
-	} while (a.GetLastError() != 2);
+	//a.SetMatrix(L.size(), n, L, f);
+
+	////a.GaussSeidelMethod();
+	////a.JacobiMethod();
+
+	//do
+	//{
+	//	//a.JacobiMethod();
+	//	a.GaussSeidelMethod();
+	//} while (a.GetLastError() != 2);
 
 	cout << endl;
 
 
-	u = a.result;
+	//u = a.result;
 }
 
 vector<vector<double>> Model::GetResult()
@@ -120,6 +138,26 @@ void Model::ConvertL2MatrixFormat()
 	}
 	L[size - 1][3] = 0;
 	L[0][1] = 0;
+}
+
+vector<vector<double>> Model::ConvertL2FullMatrix()
+{
+	vector<vector<double>> A(n*m, vector<double> (n*m));
+	
+	for (size_t i = 0; i < n * m; i++)
+	{
+		if(L[i][0])
+			A[i][i + n] = L[i][0];
+		if(L[i][1])
+			A[i][i + 1] = L[i][1];
+		A[i][i] = L[i][2];
+		if(L[i][3])
+			A[i][i - 1] = L[i][3];
+		if(L[i][4])
+			A[i][i - n] = L[i][4];
+	}
+
+	return A;
 }
 
 void Model::CreateMatrixL()
@@ -190,7 +228,8 @@ void Model::CreateMatrixL()
 							}
 							else
 							{
-								//need more code
+								L[i * m + j][2] = -lamda / hHI + borders[k].b;
+								L[i * m + j][1] = lamda / hHI;
 							}
 							break;
 						case 1:
@@ -201,7 +240,8 @@ void Model::CreateMatrixL()
 							}
 							else
 							{
-								//need more code
+								L[i * m + j][2] = -lamda / hHI + borders[k].b;
+								L[i * m + j][0] = lamda / hHI;
 							}
 							break;
 						case 2:
@@ -212,7 +252,8 @@ void Model::CreateMatrixL()
 							}
 							else
 							{
-								//need more code
+								L[i * m + j][2] = lamda / hHI + borders[k].b;
+								L[i * m + j][3] = -lamda / hHI;
 							}
 							break;
 						case 3:
@@ -223,7 +264,8 @@ void Model::CreateMatrixL()
 							}
 							else
 							{
-								//need more code
+								L[i * m + j][2] = lamda / hHI + borders[k].b;
+								L[i * m + j][4] = -lamda / hHI;
 							}
 							break;
 						}
@@ -293,7 +335,8 @@ void Model::CreateMatrixL()
 							}
 							else
 							{
-								//need more code
+								L[i * m + j][2] = -lamda / hHI + borders[k].b;
+								L[i * m + j][1] = lamda / hHI;
 							}
 							break;
 						case 1:
@@ -304,7 +347,8 @@ void Model::CreateMatrixL()
 							}
 							else
 							{
-								//need more code
+								L[i * m + j][2] = -lamda / hHI + borders[k].b;
+								L[i * m + j][0] = lamda / hHI;
 							}
 							break;
 						case 2:
@@ -315,7 +359,8 @@ void Model::CreateMatrixL()
 							}
 							else
 							{
-								//need more code
+								L[i * m + j][2] = lamda / hHI + borders[k].b;
+								L[i * m + j][3] = -lamda / hHI;
 							}
 							break;
 						case 3:
@@ -326,7 +371,8 @@ void Model::CreateMatrixL()
 							}
 							else
 							{
-								//need more code
+								L[i * m + j][2] = lamda / hHI + borders[k].b;
+								L[i * m + j][4] = -lamda / hHI;
 							}
 							break;
 						case 4:
@@ -337,7 +383,8 @@ void Model::CreateMatrixL()
 							}
 							else
 							{
-								//need more code
+								L[i * m + j][2] = -lamda / hHI + borders[k].b;
+								L[i * m + j][0] = lamda / hHI;
 							}
 							break;
 						case 5:
@@ -348,7 +395,8 @@ void Model::CreateMatrixL()
 							}
 							else
 							{
-								//need more code
+								L[i * m + j][2] = -lamda / hHI + borders[k].b;
+								L[i * m + j][1] = lamda / hHI;
 							}
 							break;
 						case 6:
@@ -359,7 +407,8 @@ void Model::CreateMatrixL()
 							}
 							else
 							{
-								//need more code
+								L[i * m + j][2] = lamda / hHI + borders[k].b;
+								L[i * m + j][3] = -lamda / hHI;
 							}
 							break;
 						case 7:
@@ -370,7 +419,8 @@ void Model::CreateMatrixL()
 							}
 							else
 							{
-								//need more code
+								L[i * m + j][2] = -lamda / hHI + borders[k].b;
+								L[i * m + j][0] = lamda / hHI;
 							}
 							break;
 						}

@@ -18,8 +18,9 @@ int main()
 	a.CreateGrid(4, 4);
 	
 	function < double(double, double) > f = [](double y, double x) { return 0; };
-	function < double(double, double) > u = [](double y, double x) { return 2*x + 2 * y; };
+	function < double(double, double) > u = [](double y, double x) { return 2 * x + 2 * y; };
 	function < double(double, double) > q = [](double y, double x) { return -2; };
+	function < double(double, double) > ub = [](double y, double x) { return 2 + 2 *(2 * x + 2 * y); };
 	
 	Model::Border b1;
 
@@ -33,16 +34,17 @@ int main()
 	b2.borderF = q;
 
 	b3.type = b3.Third;
-	b3.borderF = f;
+	b3.borderF = ub;
+	b3.b = 2;
 
-	a.AddBorder(b2);
-	a.AddBorder(b1);
-	a.AddBorder(b2);
-	a.AddBorder(b2);
-	a.AddBorder(b2);
-	a.AddBorder(b2);
-	a.AddBorder(b2);
-	a.AddBorder(b2);
+	a.AddBorder(b3);
+	a.AddBorder(b3);
+	a.AddBorder(b3);
+	a.AddBorder(b3);
+	a.AddBorder(b3);
+	a.AddBorder(b3);
+	a.AddBorder(b3);
+	a.AddBorder(b3);
 
 	a.SetF(f);
 

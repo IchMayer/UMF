@@ -8,7 +8,7 @@ template<class T>
 class Matrix
 {
 public:
-	Matrix() { maxiter = 1000;  d = k = n = m = Error = 0; e = 1e-14; w = 1; }
+	Matrix() { maxiter = 10000;  d = k = n = m = Error = 0; e = 1e-14; w = 1; }
 	~Matrix(){}
 
 	//ћатрица A, хран€ща€с€ как одномерный массив

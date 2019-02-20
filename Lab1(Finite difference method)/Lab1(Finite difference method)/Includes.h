@@ -6,3 +6,4 @@
 #include<fstream>
 #include<functional>
 #include <numeric>
+#include<Windows.h>
