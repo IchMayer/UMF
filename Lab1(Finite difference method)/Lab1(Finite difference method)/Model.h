@@ -71,10 +71,20 @@ public:
 	/// <param name="lamda">New lamda </param>
 	void SetLamda(double lamda);
 
+	/// <param name="gamma">New gamma </param>
+	void SetGamma(double gamma);
+
 
 	void FDM();
 	
 	vector<vector<double>> GetResult();
+
+	/// <param name="Kx">Коэфициент неравномерности по x </param>
+	/// <param name="Ky">Коэфициент неравномерности по y </param>
+	void SetKGrid(double Kx, double Ky);
+
+	double GethHI();
+	double GethHJ();
 
 private:
 	struct ShapeIndex
@@ -86,18 +96,20 @@ private:
 	};
 
 	double lamda;									//lamda
+	double gamma;									//gamma
 	size_t n, m;									//Matrix n * m
 	function<double(double, double)> F;				//F function
 	vector<double> f;								//f - local F
 	vector<double> u;								//u - local U
 	vector<vector<double>> L;						//L 5 diagonal matrix Lu = f
-	double hHI, hHJ;								//Step grid
-	double hLT, hJT;								//MoreStep grid not use
+	double hHI, hHJ;								//первый шаг сетки
+	double hLT, hJT;								//коэффициент неравномерности 
 	Shape shape;									//Shape of area
 	ShapeIndex index;								//Shape in index
 	vector<Border> borders;							//Border of area
 
-	void ConvertShape2Index();						
+	void ConvertShape2Index();		
+	void ConvertNeravShape2Index();
 
 	void ConvertL2MatrixFormat();					//Matrix - программа из прошлого года, которая решает диагональные матрицы методлом якоби и зегеля
 
