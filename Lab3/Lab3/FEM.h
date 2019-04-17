@@ -39,52 +39,6 @@ vector<double> operator*(vector<double> a, double b)
 	return a;
 }
 
-class LUsolve
-{
-public:
-	LUsolve() {};
-	~LUsolve() {};
-	
-	vector<vector<double>> A;
-	vector<double> F;
-	vector<double> X;
-	int n;	//Размерность матрицы А
-	int m;	//Количество лент
-	int d;	//Номер главной диаганали
-
-private:
-
-	vector<vector<double>> LU;
-
-	void CountLU()
-	{
-		m = A.size();
-		n = A[0].size();
-
-		LU.resize(A.size());
-		for (size_t i = 0; i < m; i++)
-			LU[i].resize(n);
-
-		double sum;
-
-		for (size_t i = 0; i < n; i++)
-		{
-
-			for (size_t j = max(0, d - i); j < d; j++)
-			{
-				sum = 0;
-				for (size_t k = 0; k < i; k++)
-					sum += LU[i][k] * LU[k][j];
-				LU[j][i] = A[j][i] - sum;
-			}
-		}
-	}
-	void CountX()
-	{
-
-	}
-};
-
 class FEM
 {
 public:
@@ -112,18 +66,12 @@ public:
 			Third
 		};
 
-		struct Grad
-		{
-			Grad(function<double(double)> a) :x(a){}
-			function<double(double)>& x;
-		};
-
 		TypeBorder type;
-		function<double(double)>& U;
-		Grad Thetta;
+		function<double(double, double)>& Us;
+		function<double(double, double)>& Uc;
 
 		//Задание первой краевой функции
-		Border(function<double(double)> &f, TypeBorder t) : U(f), Thetta(f)
+		Border(function<double(double, double)> &fs, function<double(double, double)> &fc, TypeBorder t) : Us(fs), Uc(fc)
 		{
 			type = t;
 		}
@@ -213,9 +161,10 @@ public:
 
 	}
 
-	void GetResult(vector<vector<double>> &U)
+	void GetResult(vector<vector<double>> &Us, vector<vector<double>> &Uc)
 	{
-		U = u;
+		Us = us;
+		Uc = uc;
 	}
 
 	#pragma region SetFunctions
@@ -224,30 +173,21 @@ public:
 	{
 		basis = b;
 	}
-	//Задать начатьное приближение
-	void SetQ0(vector<double> q0)
-	{
-		q = q0;
-	}
 	//Задать Сигму
-	void SetSigma(function<double(double, double, double)> Sigma)
-	{
-		sigma = Sigma;
-	}
+	void SetSigma(double Sigma) { sigma = Sigma; }
+	void SetOmega(double Omega) { omega = Omega; }
+	void SetLambda(double l) { lambda = l; }
 	//Добавление стороны
 	void AddBorder(Border b)
 	{
 		border.push_back(b);
 	}
 	//Дабавление лямбды
-	void SetLambda(double l)
-	{
-		lambda = l;
-	}
 	//Задание правой части
-	void SetF(function<double(double, double)> func)
+	void SetF(function<double(double, double, double)> func, function<double(double, double, double)> funs)
 	{
-		f = func;
+		fc = func;
+		fs = funs;
 	}
 	//Set t
 	void SetT(vector<double> T)
@@ -259,12 +199,18 @@ public:
 	{
 		x = X;
 	}
+	//SetY
+	void SetY(vector<double> Y)
+	{
+		y = Y;
+	}
 	#pragma endregion
 private:
 	#pragma region Privat struct
 	struct ShapeIndex
 	{
-		int				ixMax;			//Максимальный индекс			
+		int				ixMax;			//Максимальный индекс
+		int				iyMax;
 	};
 	
 	struct Matrix
@@ -292,6 +238,13 @@ private:
 		void Clear()
 		{
 			x.clear();
+		}
+		void resize(int N)
+		{
+			n = N;
+			x.resize(n);
+			for (size_t i = 0; i < n; i++)
+				x[i].resize(n);
 		}
 
 		Matrix operator*(double b)
@@ -341,76 +294,79 @@ private:
 	Basis			basis;			//Базис		
 	vector<Border>	border;			//Границы
 
-	vector<double>  t;				//Время
-	vector<double>	x;				//Координаты точке
-	vector<double>	q;				//Начальное значение
+	vector<double>	x;
+	vector<double>	y;
 
 	double			lambda;			//Лямбда
-	function<double(double, double, double)> sigma;	//Сигма
-	function<double(double, double)> f;		//Правая часть 
+	double			sigma;			//Сигма
+	double			omega;			//Омега
+	function<double(double, double, double)> fc;
+	function<double(double, double, double)> fs;
 
 	//Результат
-	vector<vector<double>>	u;		//Искомая функция
+	vector<vector<double>>	us;		//Искомая функция
+	vector<vector<double>>	uc;		//Искомая функция
 
 	//Переходные вычисления
-	ShapeIndex		index;			//Форма в координатах интексов
-	int				k;				//Количество локальных матриц
-
-	Matrix			M;				//Матрица массы
-	Matrix			G;				//Матрица жесткости
-	Matrix			Alocal;			//Локальная матрица левой части
-
-	//vector<function<double(double)>> fbasis;		//Базисы
 	vector<vector<double>> A;		//Матрица левой части в диагональном виде
 	vector<double>	b;				//Вектора правой части
-	vector<double>	blocal;			//Локальный вектор правой части
+	vector<double>	q;			
 
+	double _x, _xl;
+	double _y, _yl;
+
+	Matrix P;
+	Matrix C;
+
+	Matrix M;
+	Matrix G;
+	Matrix cF;
+
+	ShapeIndex		index;
 
 	//Обработка введеных данных
 	void Preprocessing()
 	{
-		index.ixMax = 2 * x.size() - 1;
+		index.ixMax = x.size();
+		index.iyMax = y.size();
 
-		A.resize(index.ixMax);
-		for (size_t i = 0; i < index.ixMax; i++)
-			A[i].resize(index.ixMax);
+		int m = index.ixMax * index.iyMax;
+		A.resize(m);
+		for (size_t i = 0; i < m; i++)
+			A[i].resize(m);
 
-		b.resize(index.ixMax);
-		blocal.resize(basis.order + 1);
-		Alocal = Matrix(basis.order + 1);
+		b.resize(m);
+
+		int order = basis.order + 1;
+
+		P.resize(order);
+		C.resize(order);
 
 		if (!q.size())
-			q.resize(index.ixMax);
+			q.resize(m);
 
-		k = (index.ixMax - 1.0) / 2.0;	//Определяем количество локальных матриц
+		//k = (index.ixMax - 1.0) / 2.0;	//Определяем количество локальных матриц
 		
-		add_basis(basis);
+		CreateMG();
 	}
-	//Добавление базисныйх функций и матрыцы жесткости
-	void add_basis(Basis b)
+	void CreateMG()
 	{
-		switch (b.type)
+		switch (basis.type)
 		{
-		case b.Lagrange:
-			switch (b.order)
+		case Basis::Lagrange:
+			switch (basis.order)
 			{
-			case 2:
-			{
-				//fbasis.resize(3);
-				//fbasis[0] = [](double x) { return 2 * (x - 0.5) * (x - 1); };
-				//fbasis[1] = [](double x) { return -4 * x  * (x - 1); };
-				//fbasis[2] = [](double x) { return 2 * x * (x - 0.5); };
-
-
-				double c = lambda / 3;
-				G = Matrix({ {7, -8, 1}, {-8, 16, -8}, {1, -8, 7} });
-				G *= c;
-
-				M.x.resize(3);
-				for (size_t i = 0; i < M.x.size(); i++)
-					M.x[i].resize(3);
+			case 1:
+				G.x = vector<vector<double>>{ {2, 1, -2, -1}, {1, 2, -1, -2}, {-2, -1, 2, 1}, {-1, -2, 1, 2} };
+				G = G *(this->lambda / 6.0);
+				G.n = 4;
+				M.x = vector<vector<double>>{ {4, 2, 2, 1}, {2, 4, 1, 2}, {2, 1, 4, 2}, {1, 2, 2, 4}};
+				cF.x = M.x;
+				M = M * (this->sigma / 36.0);
+				M.n = 4;
+				cF = cF/ 36.0;
+				cF.n = 4;
 				break;
-			}
 			default:
 				break;
 			}
@@ -426,37 +382,6 @@ private:
 			throw "all boundaries are not indicated";
 		if (lambda == 0)
 			throw "error lambda";
-	}
-	//Создание матрицы массы
-	Matrix CreateMatrixС(vector<double> vx)
-	{
-		Matrix C(3);
-		C.x[0][0] = vx[0] * 0.09285714285714286		+	vx[1] * 0.04761904761904761		+	vx[2] * -7.1428571428571415e-3;
-		C.x[0][1] = vx[0] * 0.04761904761904761		+	vx[1] * 0.0380952380952381		+	vx[2] * -0.01904761904761905;
-		C.x[0][2] = vx[0] * -7.1428571428571415e-3	+	vx[1]* -0.01904761904761905		+	vx[2] * -7.1428571428571415e-3;
-		C.x[1][0] = vx[0] * 0.04761904761904761		+	vx[1] * 0.0380952380952381		+	vx[2] * -0.01904761904761905;
-		C.x[1][1] = vx[0] * 0.0380952380952381		+	vx[1] * 0.4571428571428571		+	vx[2] * 0.03809523809523809;
-		C.x[1][2] = vx[0] * -0.01904761904761905	+	vx[1] * 0.03809523809523809		+	vx[2] * 0.04761904761904761;
-		C.x[2][0] = vx[0] * -7.1428571428571415e-3	+	vx[1] * -0.01904761904761905	+	vx[2] * -7.1428571428571415e-3;
-		C.x[2][1] = vx[0] * -0.01904761904761905	+	vx[1] * 0.03809523809523809		+	vx[2] * 0.04761904761904761;
-		C.x[2][2] = vx[0] * -7.1428571428571415e-3	+	vx[1] * 0.04761904761904761		+	vx[2] * 0.09285714285714286;
-
-		return C;
-	}
-	//Создание матрицы массы
-	Matrix CreateMatrixС(double x)
-	{
-		Matrix C(3);
-		C.x[0][0] = x * 0.13333333333333333;
-		C.x[0][1] = x * 0.06666666666666667;
-		C.x[0][2] = x * -0.03333333333333333;
-		C.x[1][0] = x * 0.06666666666666667;
-		C.x[1][1] = x * 0.5333333333333333;
-		C.x[1][2] = x * 0.06666666666666667;
-		C.x[2][0] = x * -0.03333333333333333;
-		C.x[2][1] = x * 0.06666666666666667;
-		C.x[2][2] = x * 0.13333333333333333;
-		return C;
 	}
 	//Добавление локальных матриц в глобальную
 	void AddLocalMatrix(int location)
@@ -485,10 +410,14 @@ private:
 		switch (border[0].type)
 		{
 		case Border::First:
-			A[0][0] = 1;
-			for (size_t i = 1; i < A[0].size(); i++)
-				A[0][i] = 0;
-			b[0] = border[0].U(t);
+			for (size_t i = 0; i < q.size(); i++)
+			{
+				for (size_t j = 0; j < q.size(); j++)
+					A[i*index.ixMax][j] = 0;
+				A[i * index.ixMax][i * index.ixMax] = 1;
+
+				b[i * index.ixMax] = border[0].U(_x, _y);
+			}
 
 			break;	
 		default:
@@ -498,15 +427,54 @@ private:
 		switch (border[1].type)
 		{
 		case Border::First:
-			A[A.size() - 1][A.size() - 1] = 1;
-			for (size_t i = 0; i < A[0].size() - 1; i++)
-				A[A.size() - 1][i] = 0;
-			b[A.size() - 1] = border[1].U(t);
+			for (size_t i = 0; i < q.size(); i++)
+			{
+				for (size_t j = 0; j < q.size(); j++)
+					A[i][j] = 0;
+				A[i][i] = 1;
+
+				b[i] = border[1].U(_x, _y);
+			}
 
 			break;
 		default:
 			break;
 		}
+
+		switch (border[2].type)
+		{
+		case Border::First:
+			for (size_t i = 0; i < q.size(); i++)
+			{
+				for (size_t j = 0; j < q.size(); j++)
+					A[(i + 1)* index.ixMax - 1][j] = 0;
+				A[(i + 1)* index.ixMax - 1][(i + 1)* index.ixMax - 1] = 1;
+
+				b[(i + 1)* index.ixMax - 1] = border[2].U(_x, _y);
+			}
+
+			break;
+		default:
+			break;
+		}
+
+		switch (border[3].type)
+		{
+		case Border::First:
+			for (size_t i = 0; i < q.size(); i++)
+			{
+				for (size_t j = 0; j < q.size(); j++)
+					A[(i + 1)* index.ixMax - 1][j] = 0;
+				A[(i + 1)* index.ixMax - 1][(i + 1)* index.ixMax - 1] = 1;
+
+				b[(i + 1)* index.ixMax - 1] = border[1].U(_x, _y);
+			}
+
+			break;
+		default:
+			break;
+		}
+
 	}
 	//Норма
 	double Norm(vector<double> b)
