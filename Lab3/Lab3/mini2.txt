@@ -1,5 +1,0 @@
-         EPS      Labmda       Sigma       Omega          HI       MSG:      TIMELOS     IterLOS         LU:      TIMELU
-       1e-10         100           0      0.0001    8.81e-12       LOS:     0.776272           0         LU:    0.655527
-       1e-10         100           0      0.0001       1e-11       LOS:      1.54855           0         LU:    0.604335
-       1e-10         100           0      0.0001       1e-10       LOS:      1.51226           0         LU:    0.592672
-       1e-10         100           0           1    8.81e-12       LOS:       1.6194           0         LU:      0.5885
